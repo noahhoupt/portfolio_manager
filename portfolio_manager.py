@@ -21,7 +21,12 @@ if __name__ == "__main__":
   )
 
   args = parser.parse_args()
-  if not any(args._get_args()):
+
+  args_vals = []
+  for key in args.__dict__:
+    args_vals.append(args.__dict__[key])
+
+  if not any(args_vals):
     parser.print_help()
 
   if args.current:

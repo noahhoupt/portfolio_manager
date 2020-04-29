@@ -1,9 +1,10 @@
 import pandas as pd
+import os.path
 
 def read_buys():
-  csv_relative_path = "../buys.csv"
+  buys_csv_path = os.path.dirname(__file__) + '/../buys.csv'
 
-  buys = pd.read_csv(csv_relative_path)
+  buys = pd.read_csv(buys_csv_path)
 
   for row in buys:
     print(row)
