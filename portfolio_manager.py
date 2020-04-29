@@ -1,7 +1,7 @@
 import argparse
 from actions.current import print_portfolio_value
 
-if __name__ == "__main__":
+def get_parser():
   parser = argparse.ArgumentParser(
     description="It tracks statistics related to your stock portfolio in real time"
   )
@@ -19,13 +19,21 @@ if __name__ == "__main__":
     default=False,
     help="Stores value of current portfolio in report.txt file"
   )
+  return parser
 
-  args = parser.parse_args()
 
+def get_arg_values(args):
   args_vals = []
   for key in args.__dict__:
     args_vals.append(args.__dict__[key])
+  return args_vals
 
+if __name__ == "__main__":
+  parser = get_parser()
+
+  args = parser.parse_args()
+
+  args_vals = get_arg_values(args)
   if not any(args_vals):
     parser.print_help()
 
