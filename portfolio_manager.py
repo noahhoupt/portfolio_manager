@@ -1,5 +1,7 @@
 import argparse
-from actions.current import print_portfolio_value
+import os.path
+import pandas as pd
+from actions.current import get_portfolio_value, get_amount_invested
 
 def get_parser():
   parser = argparse.ArgumentParser(
@@ -28,6 +30,14 @@ def get_arg_values(args):
     args_vals.append(args.__dict__[key])
   return args_vals
 
+
+def get_buys_dataframe():
+  '''Returns a Dataframe of buys.csv'''
+  buys_csv_path = os.path.dirname(__file__) + 'buys.csv'
+  buys_dataframe = pd.read_csv(buys_csv_path)
+  return buys_dataframe
+
+
 if __name__ == "__main__":
   parser = get_parser()
 
@@ -38,7 +48,7 @@ if __name__ == "__main__":
     parser.print_help()
 
   if args.current:
-    print_portfolio_value()
+    get_portfolio_value(get_buys_dataframe())
 
   if args.report:
     print("report")
