@@ -1,5 +1,40 @@
 import yfinance as yf
 from yahoo_fin import stock_info as si
+import sys
+import time
+import threading
+
+class Spinner:
+    busy = False
+    delay = 0.1
+
+    @staticmethod
+    def spinning_cursor():
+        while 1:
+            for cursor in ['|', '/', '-', '\\']: yield cursor
+
+    def __init__(self, delay=None):
+        self.spinner_generator = self.spinning_cursor()
+        if delay and float(delay): self.delay = delay
+
+    def spinner_task(self):
+        while self.busy:
+            sys.stdout.write(next(self.spinner_generator))
+            sys.stdout.flush()
+            time.sleep(self.delay)
+            sys.stdout.write('\b')
+            sys.stdout.flush()
+
+    def __enter__(self):
+        self.busy = True
+        threading.Thread(target=self.spinner_task).start()
+
+    def __exit__(self, exception, value, tb):
+        self.busy = False
+        time.sleep(self.delay)
+        if exception is not None:
+            return False
+
 
 
 def get_amount_invested(buys_dataframe):
@@ -16,6 +51,13 @@ def get_amount_invested(buys_dataframe):
   return amount_invested
 
 
+def get_live_prices(tickers_list):
+  live_prices = {}
+  for ticker in tickers_list:
+    live_prices[ticker] = si.get_live_price(ticker)
+  return live_prices
+
+
 def get_portfolio_value(buys_dataframe):
   '''
   Takes a buys dataframe and returns the current total
@@ -23,15 +65,21 @@ def get_portfolio_value(buys_dataframe):
   '''
   tickers_list = get_owned_tickers_as_list(buys_dataframe)
 
-  live_prices = {}
-  for ticker in tickers_list:
-    live_prices[ticker] = si.get_live_price(ticker)
+  res_str = "Retriving Live Data..."
+  print(res_str)
+  sys.stdout.write("\033[F")
+  sys.stdout.write("\033[" + str(len(res_str)) + "C")
+  with Spinner():
+    live_prices = get_live_prices(tickers_list)
+  for i in range(len(res_str)):
+    sys.stdout.write('\b \b')
+  sys.stdout.write("\033[F")
+  print("")
 
   live_value = {}
   live_portfolio_value = 0
   longest_ticker_symbol = get_longest_ticker_symbol(tickers_list)
   longest_value = get_longest_value(live_prices)
-  print(longest_value)
   for row in buys_dataframe.itertuples():
     spaces_after_ticker = build_spaces_after_ticker(longest_ticker_symbol, row.ticker)
     spaces_after_value = build_spaces_after_value(longest_value, live_prices[row.ticker])
