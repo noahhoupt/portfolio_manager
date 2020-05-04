@@ -9,17 +9,17 @@ def get_parser():
   )
   parser.add_argument(
     "-c",
-    "--current",
+    "--continuous",
     action='store_true',
     default=False,
-    help="Prints current value of portfolio"
+    help="Prints value of your portfolio continuously"
   )
   parser.add_argument(
-    "-r",
-    "--report",
+    "-i",
+    "--instantaneous",
     action='store_true',
     default=False,
-    help="Stores value of current portfolio in report.txt file"
+    help="Prints the instantaneous value of your portfolio"
   )
   return parser
 
@@ -47,11 +47,11 @@ if __name__ == "__main__":
   if not any(args_vals):
     parser.print_help()
 
-  if args.current:
+  if args.continuous:
     get_portfolio_value(get_buys_dataframe())
 
-  if args.report:
-    print("report")
+  if args.instantaneous:
+    get_portfolio_value(get_buys_dataframe())
 
 
 
